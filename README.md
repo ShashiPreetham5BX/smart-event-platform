@@ -1,16 +1,135 @@
-# React + Vite
+# 🎉 Smart Event Management Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack AI-powered event management platform built using React.js, Tailwind CSS, Supabase, and Vercel.
 
-Currently, two official plugins are available:
+Users can:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Browse events
+- Book tickets
+- Generate QR-based tickets
+- Download PDF tickets
+- Manage events through organizer dashboards
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# 🚀 Live Demo
 
-## Expanding the ESLint configuration
+🔗 https://smart-event-platform-pied.vercel.app
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+# ✨ Features
+
+## 👤 Authentication
+
+- User Login/Register
+- Role-based access control
+- Organizer & Attendee roles
+
+## 🎫 Event Booking
+
+- Browse available events
+- Book tickets instantly
+- QR code ticket generation
+- PDF ticket downloads
+
+## 🧑‍💼 Organizer Dashboard
+
+- Create events
+- Manage bookings
+- View analytics
+
+## ☁️ Cloud Features
+
+- Supabase Database
+- Image Uploads
+- Live Deployment on Vercel
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+- React.js
+- Tailwind CSS
+- React Router
+
+## Backend / Database
+
+- Supabase
+
+## Additional Libraries
+
+- qrcode
+- jspdf
+- react-icons
+
+## Deployment
+
+- Vercel
+
+---
+
+# 📸 Screenshots
+
+## 🏠 Home Page
+
+![Home Page](./screenshots/homepage.png)
+
+---
+
+## 🎟️ Events Page
+
+![Events Page](./screenshots/eventspage.png)
+
+---
+
+## 🎟️ Events Page 2
+
+![Events Page 2](./screenshots/eventspage2.png)
+
+---
+
+## 🔐 Login Page
+
+![Login Page](./screenshots/loginpage.png)
+
+---
+
+## 📝 Register Page
+
+![Register Page](./screenshots/registerpage.png)
+
+---
+
+## 🎫 Tickets Page
+
+![Tickets Page](./screenshots/ticketspage.png)
+
+---
+
+## 📄 PDF Ticket
+
+![PDF Ticket](./screenshots/ticketpdf.png)
+
+# ⚙️ Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/smart-event-platform.git
+```
+
+📌 Future Improvements
+UPI Payment Integration
+Email Ticket Delivery
+AI Event Recommendations
+Seat Selection System
+Advanced Analytics
+Mobile Responsive Optimization
+👨‍💻 Author
+
+Shashi Preetham
+
+Built using React + Supabase
