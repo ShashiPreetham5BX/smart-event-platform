@@ -1,178 +1,126 @@
 import { useEffect, useState } from "react"
-
-import {
-  FaCalendarAlt,
-  FaUsers,
-  FaMoneyBillWave
-} from "react-icons/fa"
-
+import { Link } from "react-router-dom"
+import { FaCalendarAlt, FaUsers, FaMoneyBillWave } from "react-icons/fa"
+import DashboardLayout from "../layouts/DashboardLayout"
+import StatCard from "../components/ui/StatCard"
 import { supabase } from "../services/supabase"
-
+import { useExport } from "../hooks/useExport"
+import { useToast } from "../context/ToastContext"
+import { useEvents } from "../hooks/useEvents"
+import PricingAssistant from "../components/ui/PricingAssistant"
 const Dashboard = () => {
-
-  // STATES
-
   const [totalEvents, setTotalEvents] = useState(0)
-
   const [totalBookings, setTotalBookings] = useState(0)
-
   const [totalRevenue, setTotalRevenue] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const { exportBookings } = useExport()
+  const { showToast } = useToast()
+  const [exporting, setExporting] = useState(false)
+  const { user } = useAuth()
+  const { events: allRecentEvents, loading: eventsLoading } = useEvents({ page: 1 })
+  const myEvents = allRecentEvents.filter((e) => e.organizer_id === user?.id)
+  const handleExportAll = async () => {
+    setExporting(true)
+    const result = await exportBookings()
+    setExporting(false)
 
-  // FETCH DASHBOARD DATA
-
+    if (!result.success) {
+      showToast(result.error, "error")
+    } else {
+      showToast("Export downloaded")
+    }
+  }
   const fetchDashboardData = async () => {
+    setLoading(true)
 
-    // FETCH EVENTS
-
-    const { data: eventsData, error: eventsError } = await supabase
+    const { count: eventsCount, error: eventsError } = await supabase
       .from("events")
-      .select("*")
+      .select("*", { count: "exact", head: true })
 
     if (eventsError) {
-      console.log(eventsError)
+      console.error(eventsError)
     } else {
-      setTotalEvents(eventsData.length)
+      setTotalEvents(eventsCount ?? 0)
     }
-
-    // FETCH BOOKINGS
 
     const { data: bookingsData, error: bookingsError } = await supabase
       .from("bookings")
       .select("*")
 
     if (bookingsError) {
-      console.log(bookingsError)
+      console.error(bookingsError)
     } else {
-
       setTotalBookings(bookingsData.length)
-
-      // CALCULATE REVENUE
-
       const revenue = bookingsData.reduce(
-        (total, booking) =>
-          total + Number(booking.total_amount || 0),
+        (total, booking) => total + Number(booking.total_amount || 0),
         0
       )
-
       setTotalRevenue(revenue)
     }
-  }
 
-  // LOAD DATA ON PAGE OPEN
+    setLoading(false)
+  }
 
   useEffect(() => {
     fetchDashboardData()
   }, [])
-const handleLogout = async () => {
 
-  await supabase.auth.signOut()
-
-  window.location.href = "/login"
-}
   return (
-
-    <div className="min-h-screen bg-black text-white flex">
-
-      {/* SIDEBAR */}
-
-      <div className="w-64 bg-zinc-900 p-6 border-r border-zinc-800">
-
-        <h1 className="text-3xl font-bold text-blue-400 mb-10">
-          EventAI
-        </h1>
-
-        <div className="space-y-6 text-lg">
-
-          <p className="hover:text-blue-400 cursor-pointer">
-            Dashboard
-          </p>
-
-          <p className="hover:text-blue-400 cursor-pointer">
-            Events
-          </p>
-
-          <p className="hover:text-blue-400 cursor-pointer">
-            Bookings
-          </p>
-
-          <p className="hover:text-blue-400 cursor-pointer">
-            Analytics
-          </p>
-          <button
-  onClick={handleLogout}
-  className="bg-red-500 hover:bg-red-600 px-5 py-3 rounded-xl mt-10"
->
-  Logout
-</button>
-        </div>
-
+    <DashboardLayout><div className="mb-10 flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 className="text-4xl font-bold text-text-primary">Organizer Dashboard</h1>
+        <p className="text-text-secondary mt-1">An overview of your events and bookings.</p>
       </div>
-
-      {/* MAIN CONTENT */}
-
-      <div className="flex-1 p-10">
-
-        <h1 className="text-5xl font-bold mb-10">
-          Organizer Dashboard
-        </h1>
-
-        {/* STATS CARDS */}
-
-        <div className="grid md:grid-cols-3 gap-8">
-
-          {/* TOTAL EVENTS */}
-
-          <div className="bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
-
-            <FaCalendarAlt className="text-4xl text-blue-400 mb-4" />
-
-            <h2 className="text-2xl font-bold">
-              Total Events
-            </h2>
-
-            <p className="text-5xl mt-4 font-bold">
-              {totalEvents}
-            </p>
-
-          </div>
-
-          {/* TOTAL BOOKINGS */}
-
-          <div className="bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
-
-            <FaUsers className="text-4xl text-green-400 mb-4" />
-
-            <h2 className="text-2xl font-bold">
-              Total Bookings
-            </h2>
-
-            <p className="text-5xl mt-4 font-bold">
-              {totalBookings}
-            </p>
-
-          </div>
-
-          {/* TOTAL REVENUE */}
-
-          <div className="bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
-
-            <FaMoneyBillWave className="text-4xl text-yellow-400 mb-4" />
-
-            <h2 className="text-2xl font-bold">
-              Revenue
-            </h2>
-
-            <p className="text-5xl mt-4 font-bold">
-              ₹ {totalRevenue}
-            </p>
-
-          </div>
-
-        </div>
-
+      <div className="flex gap-3">
+        <Link
+          to="/check-in"
+          className="bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+        >
+          Open Check-In Scanner
+        </Link>
+        <button
+          onClick={handleExportAll}
+          disabled={exporting}
+          className="bg-surface border border-border hover:bg-surface-hover disabled:opacity-50 text-text-primary px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+        >
+          {exporting ? "Exporting..." : "Export All Bookings (CSV)"}
+        </button>
       </div>
-
     </div>
+
+      {loading ? (
+        <div className="grid md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-surface border border-border rounded-xl p-6 h-40 animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-6">
+          <StatCard icon={FaCalendarAlt} label="Total Events" value={totalEvents} />
+          <StatCard icon={FaUsers} label="Total Bookings" value={totalBookings} />
+          <StatCard icon={FaMoneyBillWave} label="Revenue" value={`₹${totalRevenue}`} accent />
+        </div>
+      )}
+
+      <div className="mt-14">
+        <h2 className="text-2xl font-bold mb-6">Pricing Insights</h2>
+
+        {eventsLoading ? (
+          <div className="bg-surface border border-border rounded-xl h-24 animate-pulse" />
+        ) : myEvents.length === 0 ? (
+          <p className="text-text-secondary text-sm">No events yet.</p>
+        ) : (
+          <div className="space-y-4">
+            {myEvents.map((event) => (
+              <div key={event.id} className="bg-surface border border-border rounded-xl p-5">
+                <h3 className="font-semibold mb-3">{event.title}</h3>
+                <PricingAssistant eventId={event.id} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </DashboardLayout>
   )
 }
 

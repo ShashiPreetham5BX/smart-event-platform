@@ -1,221 +1,106 @@
-import { useEffect, useState } from "react"
-import { supabase } from "../services/supabase"
 import jsPDF from "jspdf"
 import { useAuth } from "../context/AuthContext"
+import { useBookings } from "../hooks/useBookings"
+import EmptyState from "../components/ui/EmptyState"
+import Spinner from "../components/ui/Spinner"
 
 const Bookings = () => {
-
-  const [bookings, setBookings] = useState([])
-
   const { user } = useAuth()
-
-  // FETCH BOOKINGS
-
-  const fetchBookings = async () => {
-
-    const { data, error } = await supabase
-      .from("bookings")
-      .select(`
-        *,
-        events (
-          title,
-          venue
-        )
-      `)
-
-    if (error) {
-
-      console.log(error)
-    }
-    else {
-
-      setBookings(data)
-    }
-  }
-
-  // DOWNLOAD PDF
+  const { bookings, loading, error } = useBookings()
 
   const downloadTicket = (booking) => {
-
     const doc = new jsPDF()
 
-    // HEADER
-
     doc.setFillColor(20, 20, 20)
-
     doc.rect(0, 0, 210, 35, "F")
-
     doc.setTextColor(255, 255, 255)
-
     doc.setFontSize(24)
-
     doc.text("EVENT TICKET", 20, 22)
 
-    // RESET TEXT COLOR
-
     doc.setTextColor(0, 0, 0)
-
-    // TICKET DETAILS
-
     doc.setFontSize(16)
-
     doc.text(`Ticket ID: ${booking.id}`, 20, 50)
-
-    doc.text(
-      `Customer Name: ${user?.email?.split("@")[0]}`,
-      20,
-      65
-    )
-
-    doc.text(
-      `Customer Email: ${user?.email}`,
-      20,
-      80
-    )
-
-    doc.text(
-      `Event: ${booking.events?.title}`,
-      20,
-      95
-    )
-
-    doc.text(
-      `Venue: ${booking.events?.venue}`,
-      20,
-      110
-    )
-
-    doc.text(
-      `Ticket Count: ${booking.ticket_count}`,
-      20,
-      125
-    )
-
-    doc.text(
-      `Total Amount: ₹ ${booking.total_amount}`,
-      20,
-      140
-    )
-
-    // BOOKING DATE
-
-    doc.text(
-      `Booking Date: ${new Date(
-        booking.booked_at
-      ).toLocaleString()}`,
-      20,
-      155
-    )
-
-    // QR CODE
+    doc.text(`Customer Name: ${user?.email?.split("@")[0]}`, 20, 65)
+    doc.text(`Customer Email: ${user?.email}`, 20, 80)
+    doc.text(`Event: ${booking.events?.title}`, 20, 95)
+    doc.text(`Venue: ${booking.events?.venue}`, 20, 110)
+    doc.text(`Ticket Count: ${booking.ticket_count}`, 20, 125)
+    doc.text(`Total Amount: ₹ ${booking.total_amount}`, 20, 140)
+    doc.text(`Booking Date: ${new Date(booking.booked_at).toLocaleString()}`, 20, 155)
 
     if (booking.qr_code) {
-
-      doc.addImage(
-        booking.qr_code,
-        "PNG",
-        120,
-        55,
-        60,
-        60
-      )
+      doc.addImage(booking.qr_code, "PNG", 120, 55, 60, 60)
     }
 
-    // FOOTER
-
     doc.setFontSize(12)
-
     doc.setTextColor(100)
-
-    doc.text(
-      "Please carry this ticket during event entry.",
-      20,
-      190
-    )
-
-    doc.text(
-      "Powered by EventAI Platform",
-      20,
-      200
-    )
-
-    // SAVE PDF
+    doc.text("Please carry this ticket during event entry.", 20, 190)
+    doc.text("Powered by EventAI Platform", 20, 200)
 
     doc.save(`ticket-${booking.id}.pdf`)
   }
 
-  // LOAD BOOKINGS
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg text-text-primary flex flex-col items-center justify-center gap-3">
+        <Spinner size="lg" label="Loading your tickets" />
+        <p className="text-text-secondary text-sm">Loading your tickets...</p>
+      </div>
+    )
+  }
 
-  useEffect(() => {
-
-    fetchBookings()
-
-  }, [])
+  if (error) {
+    return (
+      <div className="min-h-screen bg-bg text-text-primary flex items-center justify-center">
+        Something went wrong: {error}
+      </div>
+    )
+  }
 
   return (
+    <div className="min-h-screen bg-bg text-text-primary p-6 md:p-10 max-w-7xl mx-auto">
+      <h1 className="text-4xl font-bold mb-10">My Tickets</h1>
 
-    <div className="min-h-screen bg-black text-white p-10">
-
-      <h1 className="text-5xl font-bold mb-10">
-        My Tickets
-      </h1>
-
-      <div className="grid md:grid-cols-3 gap-8">
-
-        {bookings.map((booking) => (
-
-          <div
-            key={booking.id}
-            className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800"
-          >
-
-            <h2 className="text-2xl font-bold mb-4">
-              Ticket #{booking.id}
-            </h2>
-
-            <p className="text-zinc-400">
-              Event:
-              {" "}
-              {booking.events?.title}
-            </p>
-
-            <p className="text-zinc-400 mt-2">
-              Venue:
-              {" "}
-              {booking.events?.venue}
-            </p>
-
-            <p className="text-blue-400 mt-4 text-xl font-semibold">
-              ₹ {booking.total_amount}
-            </p>
-
-            {/* QR CODE */}
-
-            {booking.qr_code && (
-
-              <img
-                src={booking.qr_code}
-                alt="QR"
-                className="mt-6 rounded-xl bg-white p-4 w-52"
-              />
-
-            )}
-
-            {/* DOWNLOAD BUTTON */}
-
-            <button
-              onClick={() => downloadTicket(booking)}
-              className="mt-6 bg-blue-500 hover:bg-blue-600 px-5 py-3 rounded-xl"
+      {bookings.length === 0 ? (
+        <EmptyState
+          icon="🎟️"
+          title="No tickets yet"
+          description="You haven't booked any events. Browse what's happening and grab your first ticket."
+          actionLabel="Explore Events"
+          actionTo="/events"
+        />
+      ) : (
+        <div className="grid md:grid-cols-3 gap-6">
+          {bookings.map((booking) => (
+            <div
+              key={booking.id}
+              className="bg-surface p-6 rounded-xl border border-border"
             >
-              Download PDF
-            </button>
+              <h2 className="text-xl font-bold mb-3">Ticket #{booking.id}</h2>
+              <p className="text-text-secondary text-sm">Event: {booking.events?.title}</p>
+              <p className="text-text-secondary text-sm mt-1">Venue: {booking.events?.venue}</p>
+              <p className="text-accent mt-3 text-lg font-semibold">
+                ₹ {booking.total_amount}
+              </p>
 
-          </div>
+              {booking.qr_code && (
+                <img
+                  src={booking.qr_code}
+                  alt="QR"
+                  className="mt-5 rounded-xl bg-white p-4 w-48"
+                />
+              )}
 
-        ))}
-
-      </div>
-
+              <button
+                onClick={() => downloadTicket(booking)}
+                className="mt-5 w-full bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+              >
+                Download PDF
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
