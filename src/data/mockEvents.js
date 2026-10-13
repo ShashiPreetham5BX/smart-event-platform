@@ -1,0 +1,222 @@
+export const MOCK_EVENTS = [
+  {
+    id: 1,
+    title: "Global AI & Tech Summit 2026",
+    venue: "Hitex Exhibition Center, Hyderabad",
+    city: "Hyderabad",
+    price: 499,
+    category: "tech",
+    capacity: 250,
+    event_date: "2026-11-15",
+    event_time: "10:00",
+    banner_url: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&auto=format&fit=crop&q=80",
+    description: "Explore the bleeding edge of artificial intelligence, agentic workflows, autonomous systems, and generative architectures with global tech leaders and research fellows.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: true,
+      signLanguage: true,
+      quietZone: true,
+      parking: true,
+      notes: "Dedicated wheelchair ramps at Halls 1 & 2. Assistive audio loop enabled in Keynote auditorium."
+    }
+  },
+  {
+    id: 2,
+    title: "Indie Beats Live Music Fest",
+    venue: "Gachibowli Stadium Ground, Hyderabad",
+    city: "Hyderabad",
+    price: 799,
+    category: "music",
+    capacity: 500,
+    event_date: "2026-11-20",
+    event_time: "18:30",
+    banner_url: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&auto=format&fit=crop&q=80",
+    description: "An electrifying open-air musical evening featuring breakthrough indie artists, acoustic sets, indie pop bands, interactive art installations, and curated gourmet food trucks.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: false,
+      signLanguage: false,
+      quietZone: true,
+      parking: true,
+      notes: "Ground level step-free entry. Quiet relaxation zone situated near the East Entrance."
+    }
+  },
+  {
+    id: 3,
+    title: "Startup Pitch & Venture Networking",
+    venue: "T-Hub Phase 2, Knowledge City, Hyderabad",
+    city: "Hyderabad",
+    price: 299,
+    category: "business",
+    capacity: 120,
+    event_date: "2026-11-25",
+    event_time: "14:00",
+    banner_url: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=1200&auto=format&fit=crop&q=80",
+    description: "Connect face-to-face with top angel syndicates, institutional venture capitalists, and visionary startup founders building scalable solutions across fintech, SaaS, and robotics.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: true,
+      signLanguage: false,
+      quietZone: true,
+      parking: true,
+      notes: "Fully ADA-compliant modern campus with elevators and reserved accessible parking bays."
+    }
+  },
+  {
+    id: 4,
+    title: "Full-Stack React & Node Masterclass",
+    venue: "Online Interactive Live Stream, Hyderabad",
+    city: "Hyderabad",
+    price: 0,
+    category: "workshop",
+    capacity: 300,
+    event_date: "2026-12-01",
+    event_time: "11:00",
+    banner_url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&auto=format&fit=crop&q=80",
+    description: "Hands-on engineering workshop exploring React 19 server components, concurrent rendering, Tailwind CSS design tokens, and real-time backend synchronization.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: true,
+      signLanguage: true,
+      quietZone: true,
+      parking: true,
+      notes: "Live closed captioning (AI Subtitles) and downloadable session transcripts provided."
+    }
+  },
+  {
+    id: 5,
+    title: "Bangalore Cloud & DevOps Summit 2026",
+    venue: "Whitefield Convention Centre, Bengaluru",
+    city: "Bengaluru",
+    price: 699,
+    category: "tech",
+    capacity: 350,
+    event_date: "2026-11-22",
+    event_time: "09:30",
+    banner_url: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&auto=format&fit=crop&q=80",
+    description: "The premier platform for cloud architects, platform engineers, and SREs discussing Kubernetes at scale, edge compute, and resilient multi-cloud architectures.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: true,
+      signLanguage: false,
+      quietZone: true,
+      parking: true,
+      notes: "Step-free ramp access at main entrance and elevator access to all breakout sessions."
+    }
+  },
+  {
+    id: 6,
+    title: "Laugh Riot: Standup Comedy Night",
+    venue: "That Comedy Club, Koramangala, Bengaluru",
+    city: "Bengaluru",
+    price: 499,
+    category: "comedy",
+    capacity: 180,
+    event_date: "2026-11-28",
+    event_time: "20:00",
+    banner_url: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=1200&auto=format&fit=crop&q=80",
+    description: "Catch India's top standup comics testing their freshest material. 90 minutes of non-stop laughter, observational wit, and hilarious crowd work.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: false,
+      signLanguage: false,
+      quietZone: false,
+      parking: true,
+      notes: "Ground-floor seating available on request. Please inform team 30 mins prior to show."
+    }
+  },
+  {
+    id: 7,
+    title: "Mumbai Electronic Odyssey — Neon Lights",
+    venue: "Dome, NSCI, Worli, Mumbai",
+    city: "Mumbai",
+    price: 1299,
+    category: "music",
+    capacity: 800,
+    event_date: "2026-12-05",
+    event_time: "19:00",
+    banner_url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop&q=80",
+    description: "A multisensory electronic music spectacle featuring international headline DJs, immersive laser choreography, and crystal-clear acoustic surround sound.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: true,
+      signLanguage: false,
+      quietZone: true,
+      parking: true,
+      notes: "Elevated wheelchair viewing platform. Complimentary noise-dampening earplugs available at helpdesk."
+    }
+  },
+  {
+    id: 8,
+    title: "Delhi FinTech & Web3 Conclave",
+    venue: "Pragati Maidan Hall 5, Delhi NCR",
+    city: "Delhi NCR",
+    price: 899,
+    category: "business",
+    capacity: 400,
+    event_date: "2026-12-10",
+    event_time: "10:30",
+    banner_url: "https://images.unsplash.com/photo-1559223607-a43c990c692c?w=1200&auto=format&fit=crop&q=80",
+    description: "Bringing together banking innovators, policy makers, DeFi protocols, and payment giants to debate the future of digital sovereign currencies and algorithmic trading.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: true,
+      signLanguage: true,
+      quietZone: true,
+      parking: true,
+      notes: "Direct metro access (Supreme Court Metro station) with tactile flooring and step-free routes."
+    }
+  },
+  {
+    id: 9,
+    title: "Pune Classical Fusion & Sitar Evening",
+    venue: "Bal Gandharva Ranga Mandir, Pune",
+    city: "Pune",
+    price: 399,
+    category: "theatre",
+    capacity: 250,
+    event_date: "2026-12-12",
+    event_time: "18:00",
+    banner_url: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=1200&auto=format&fit=crop&q=80",
+    description: "Experience the harmonious blend of Indian classical ragas with contemporary flamenco and ambient acoustic instruments performed by virtuoso maestros.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: true,
+      signLanguage: false,
+      quietZone: true,
+      parking: true,
+      notes: "Auditorium has dedicated wheelchair positions in Row E. Hearing induction loop operational."
+    }
+  },
+  {
+    id: 10,
+    title: "Chennai Marathon & Sports Expo 2026",
+    venue: "Marina Beach Promenade, Chennai",
+    city: "Chennai",
+    price: 199,
+    category: "sports",
+    capacity: 1000,
+    event_date: "2026-12-18",
+    event_time: "05:30",
+    banner_url: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&auto=format&fit=crop&q=80",
+    description: "Join thousands of runners along the scenic coastline for 5K, 10K, and Half-Marathon runs, featuring timed RFID bibs, medal distribution, and fitness workshops.",
+    organizer_id: "demo-organizer",
+    accessibility: {
+      wheelchair: true,
+      audioAssist: false,
+      signLanguage: false,
+      quietZone: true,
+      parking: true,
+      notes: "Dedicated Parathletes Wheelchair 5K division with marshaled assistance and water stations."
+    }
+  }
+]

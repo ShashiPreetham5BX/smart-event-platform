@@ -25,6 +25,7 @@ const CheckIn = () => {
     const [downloading, setDownloading] = useState(false)
     const [downloadedCount, setDownloadedCount] = useState(0)
     const [queuedCount, setQueuedCount] = useState(0)
+    const [manualToken, setManualToken] = useState("")
 
     // Track real browser online/offline state
     useEffect(() => {
@@ -45,6 +46,29 @@ const CheckIn = () => {
         setQueuedCount(queue.length)
     }, [])
 
+    const syncQueue = useCallback(async () => {
+        const queue = await getQueuedCheckIns()
+        if (queue.length === 0) return
+
+        for (const item of queue) {
+            const outcome = await checkInTicket(item.ticket_token)
+
+            // We remove it from the queue regardless of outcome — if the
+            // server says "already checked in," that's a real conflict from
+            // another device, which we surface rather than retry forever.
+            await removeFromQueue(item.id)
+
+            if (!outcome.success) {
+                showToast(
+                    `Sync conflict: ${item.ticket_token.slice(0, 8)}... — ${outcome.message}`,
+                    "error"
+                )
+            }
+        }
+
+        refreshQueueCount()
+    }, [checkInTicket, refreshQueueCount, showToast])
+
     useEffect(() => {
         refreshQueueCount()
     }, [refreshQueueCount])
@@ -54,8 +78,7 @@ const CheckIn = () => {
         if (isOnline) {
             syncQueue()
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isOnline])
+    }, [isOnline, syncQueue])
 
     const handleDownloadForOffline = async () => {
         if (!eventId) {
@@ -86,29 +109,6 @@ const CheckIn = () => {
         await cacheTicketsForEvent(tickets)
         setDownloadedCount(tickets.length)
         showToast(`${tickets.length} tickets cached for offline check-in`)
-    }
-
-    const syncQueue = async () => {
-        const queue = await getQueuedCheckIns()
-        if (queue.length === 0) return
-
-        for (const item of queue) {
-            const outcome = await checkInTicket(item.ticket_token)
-
-            // We remove it from the queue regardless of outcome — if the
-            // server says "already checked in," that's a real conflict from
-            // another device, which we surface rather than retry forever.
-            await removeFromQueue(item.id)
-
-            if (!outcome.success) {
-                showToast(
-                    `Sync conflict: ${item.ticket_token.slice(0, 8)}... — ${outcome.message}`,
-                    "error"
-                )
-            }
-        }
-
-        refreshQueueCount()
     }
 
     const handleScan = useCallback(async (token) => {
@@ -177,6 +177,33 @@ const CheckIn = () => {
             </button>
 
             <CheckInScanner onScan={handleScan} paused={paused} />
+
+            {/* Manual Token Verification fallback */}
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault()
+                    if (manualToken.trim()) {
+                        handleScan(manualToken.trim())
+                        setManualToken("")
+                    }
+                }}
+                className="mt-4 flex gap-2"
+            >
+                <input
+                    type="text"
+                    placeholder="Enter or paste ticket token (e.g. evt-...)"
+                    value={manualToken}
+                    onChange={(e) => setManualToken(e.target.value)}
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-border text-xs focus:outline-none focus:border-accent font-mono text-text-primary"
+                />
+                <button
+                    type="submit"
+                    disabled={!manualToken.trim() || processing}
+                    className="bg-accent hover:bg-accent-hover disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0"
+                >
+                    Verify
+                </button>
+            </form>
 
             {result && (
                 <div

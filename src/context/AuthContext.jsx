@@ -4,73 +4,98 @@ import { supabase } from "../services/supabase"
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-
   const [user, setUser] = useState(null)
   const [role, setRole] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const fetchRole = async (currentUser) => {
-
     if (!currentUser) {
       setRole(null)
       return
     }
 
-    const { data: userData, error } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", currentUser.id)
-      .single()
+    // Fast-path: immediate role from metadata so UI is never blocked
+    const metaRole = currentUser.user_metadata?.role
+    if (metaRole) {
+      setRole(metaRole)
+    }
 
-    if (error) {
-      console.error("Role fetch failed:", error.message)
-      setRole(null)
-    } else {
-      setRole(userData?.role ?? null)
+    try {
+      const rolePromise = supabase
+        .from("users")
+        .select("role")
+        .eq("id", currentUser.id)
+        .single()
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), 1500)
+      )
+
+      const { data: userData, error } = await Promise.race([rolePromise, timeoutPromise])
+
+      if (!error && userData?.role) {
+        setRole(userData.role)
+      } else if (!metaRole) {
+        setRole("attendee")
+      }
+    } catch {
+      // If table query times out or fails, gracefully fallback
+      if (!metaRole) {
+        setRole("attendee")
+      }
     }
   }
 
   useEffect(() => {
+    let mounted = true
 
-    // Safety net: if nothing has resolved within 5 seconds for any reason,
-    // stop showing "Loading..." forever and treat the user as logged out.
-    const safetyTimeout = setTimeout(() => {
-      setLoading((current) => {
-        if (current) {
-          console.warn("Auth check timed out — clearing local session.")
-          supabase.auth.signOut({ scope: "local" })
-          setUser(null)
-          setRole(null)
+    // 1. Initial quick session check from local cache
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (!mounted) return
+        const currentUser = session?.user ?? null
+        setUser(currentUser)
+        if (currentUser?.user_metadata?.role) {
+          setRole(currentUser.user_metadata.role)
         }
-        return false
+        setLoading(false)
+        if (currentUser) {
+          fetchRole(currentUser)
+        }
       })
-    }, 5000)
+      .catch((err) => {
+        console.warn("Local auth session check failed:", err.message)
+        if (mounted) setLoading(false)
+      })
 
-    // We rely ONLY on onAuthStateChange, not a separate getSession() call.
-    // Supabase fires an "INITIAL_SESSION" event immediately on subscribe,
-    // which tells us the current session state without needing a second,
-    // redundant request that can hang under certain browser lock conditions.
+    // 2. Listen to ongoing auth events
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-
-        const currentUser = session?.user ?? null
-
-        setUser(currentUser)
-
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+      if (currentUser?.user_metadata?.role) {
+        setRole(currentUser.user_metadata.role)
+      }
+      setLoading(false)
+      if (currentUser) {
         await fetchRole(currentUser)
+      }
+    })
 
-        clearTimeout(safetyTimeout)
+    // 3. Resilient safety net: NEVER block UI for more than 1.5 seconds!
+    const safetyTimer = setTimeout(() => {
+      if (mounted) {
         setLoading(false)
       }
-    )
+    }, 1500)
 
     return () => {
-      clearTimeout(safetyTimeout)
+      mounted = false
+      clearTimeout(safetyTimer)
       subscription.unsubscribe()
     }
-
   }, [])
 
   return (

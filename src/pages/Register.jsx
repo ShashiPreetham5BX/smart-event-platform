@@ -45,7 +45,7 @@ const Register = () => {
       })
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out. Please try again.")), 10000)
+        setTimeout(() => reject(new Error("Request timed out. Please try again.")), 4000)
       )
 
       const { error } = await Promise.race([signUpPromise, timeoutPromise])
@@ -59,7 +59,11 @@ const Register = () => {
       navigate("/")
     } catch (err) {
       Sentry.captureException(err)
-      setFieldErrors({ form: err.message })
+      const isNetwork = err.message?.includes("Failed to fetch") || err.message?.includes("timed out")
+      const message = isNetwork
+        ? "Unable to reach database (Supabase project is paused/inactive). Please restore your project in the Supabase dashboard."
+        : err.message
+      setFieldErrors({ form: message })
     } finally {
       setIsLoading(false)
     }

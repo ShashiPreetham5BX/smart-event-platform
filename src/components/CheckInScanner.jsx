@@ -21,7 +21,7 @@ const CheckInScanner = ({ onScan, paused }) => {
                     await videoRef.current.play()
                     scanLoop()
                 }
-            } catch (err) {
+            } catch {
                 setCameraError(
                     "Could not access camera. Please grant camera permission and reload."
                 )

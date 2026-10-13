@@ -8,6 +8,7 @@ import './index.css'
 
 import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
+import { CityProvider } from './context/CityContext'
 import * as Sentry from "@sentry/react"
 
 Sentry.init({
@@ -24,7 +25,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
     <BrowserRouter>
       <AuthProvider>
-        <ToastProvider>
+        <CityProvider>
+          <ToastProvider>
 
           <Sentry.ErrorBoundary
             fallback={
@@ -46,6 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           </Sentry.ErrorBoundary>
 
         </ToastProvider>
+        </CityProvider>
       </AuthProvider>
     </BrowserRouter>
 

@@ -36,7 +36,7 @@ const Login = () => {
     try {
       const loginPromise = supabase.auth.signInWithPassword({ email, password })
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out. Please try again.")), 10000)
+        setTimeout(() => reject(new Error("Request timed out. Please try again.")), 4000)
       )
 
       const { error } = await Promise.race([loginPromise, timeoutPromise])
@@ -48,7 +48,11 @@ const Login = () => {
         navigate("/")
       }
     } catch (err) {
-      setFieldErrors({ form: err.message })
+      const isNetwork = err.message?.includes("Failed to fetch") || err.message?.includes("timed out")
+      const message = isNetwork
+        ? "Unable to reach database (Supabase project is paused/inactive). Please restore your project in the Supabase dashboard."
+        : err.message
+      setFieldErrors({ form: message })
     } finally {
       setIsLoading(false)
     }
